@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Directly accesses the form model / form data API.
+ *
+ * Base class for general Ext.Direct store calls (CRUD).
+ * Controls the parameter processing for filtering,
+ * pagination, sorting etc.
+ */
+class ORN_Controller_FormData extends ORN_Controller_Store
+{
+    /**
+     * Service name
+     * @var string
+     */
+    protected $_serviceName = 'Core_FormData';
+}

@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]
+
+#Legacy rewrite for files, that are directly included (e.g. reporting.js)
+RewriteRule /js/(.*)\.js /js/js-parser.php?js-file=$1.js [QSA,LAST]
+
+ErrorDocument 404 /404.php

@@ -1,0 +1,277 @@
+<?php
+
+/**
+ * Base class for general Ext.Direct store calls (CRUD).
+ * Controls the parameter processing for filtering,
+ * pagination, sorting etc.
+ */
+class ORN_Controller_Store extends ORN_Controller_Legacy
+{
+    /**
+     * Model instance
+     * @var ORN_Model_Frontend
+     */
+    protected $_model = null;
+
+
+    /**
+     * Service name
+     * @var string
+     */
+    protected $_serviceName = '';
+
+
+    /**
+     * Automated creation of the
+     * @return unknown_type
+     */
+    public function __construct(Zend_Controller_Request_Abstract $request,
+                                Zend_Controller_Response_Abstract $response,
+                                array $invokeArgs = array())
+    {
+        $this->_initModel($this->_serviceName);
+        parent::__construct($request, $response, $invokeArgs);
+    }
+
+
+    /**
+     * Reads data from the service API.
+     * Accessed by Ext.Direct.
+     *
+     * @param array $options Options provided by Ext DirectProxy
+     * @remotable
+     * @return ORN_Backend_Result
+     */
+    public function read($options)
+    {
+        // @TODO
+        // Fields not given currently, maybe later using extraParams,
+        // which get merged into $options array.
+        $fields = null;
+
+        // Parse paging
+        $limit = null;
+        if (isset($options->limit)) {
+            $limit = $options->limit;
+        }
+
+        $start = null;
+        if (isset($options->start)) {
+            $start = $options->start;
+        }
+
+        $paging = null;
+        if ($limit != null || $start != null) {
+            $paging = ORN_Backend::getPagingConfig($start, $limit);
+        }
+
+        // Parse sorting
+
+        // array(
+        //     array('property' => 'fieldName', 'direction' => 'ASC|DESC'), ...
+        // )
+        $sorters = null;
+
+        // Try to solve encoded sort
+        if (isset($options->sort) && is_string($options->sort)) {
+            $options->sort = @Zend_Json::decode($options->sort);
+        }
+
+        // Assignment and type conversion
+        if (isset($options->sort) && is_array($options->sort)) {
+            for ($i=0; $i<sizeof($options->sort); $i++) {
+                $options->sort[$i] = (array) $options->sort[$i];
+            }
+            $sorters = $options->sort;
+        }
+
+        // Parse filters
+
+        // array(
+        //     array('property' => 'fieldName', 'value' => 'abc'), ...
+        // )
+        $filters = null;
+
+        // Try to solve encoded filter
+        if (isset($options->filter) && is_string($options->filter)) {
+            $options->filter = @Zend_Json::decode($options->filter);
+        }
+
+        // Assignment, configuration generation and type conversion
+        if (isset($options->filter) && is_array($options->filter)) {
+
+            $filters = array();
+
+            // Apply extraParams as filters
+            foreach($options as $key => $value) {
+
+               // All params other than these params are extraPramams to be applied as filters
+               if ($key != "filter" && $key != "page" && $key != "fields" && $key != "limit" &&
+                   $key != "start" && $key != "paging" && $key != "sorters") {
+
+                   $filter = array("property" => $key, "value" => $value);
+                   array_push($options->filter, $filter);
+               }
+           }
+
+
+            // Walk filters
+            for ($i=0; $i<sizeof($options->filter); $i++) {
+
+                $options->filter[$i] = (array) $options->filter[$i];
+
+                // Happens when filters are applied by auto-filter-form
+                if (is_object($options->filter[$i]['value'])) {
+                    $options->filter[$i]['value'] = $options->filter[$i]['value']->value;
+                }
+
+                $filters[] = ORN_Backend::getFilterConfig(
+                    $options->filter[$i]['property'],
+                    $options->filter[$i]['value']
+                );
+            }
+        }
+
+        // Tree read node id traversal
+        if (isset($options->node)) {
+            $filters[] = ORN_Backend::getFilterConfig("id", $options->node);
+        }
+
+        // Fire backend request or return error
+        if ($this->_model != null) {
+            return $this->_model->read($filters, $fields, $paging, $sorters);
+        } else {
+            return $this->_noModelError();
+        }
+    }
+
+
+    /**
+     * Creates a record via service API.
+     * Accessed by Ext.Direct.
+     *
+     * @remotable
+     * @param array $data Data provided by Ext DirectProxy
+     * @return ORN_Backend_Result
+     */
+    public function create($data)
+    {
+        // Assign the modelName as filter
+        $filters = array();
+        if (is_object($data) && isset($data->moduleId)) {
+            $filters = ORN_Backend::getFilterConfig('moduleId', $data->moduleId);
+            unset($data->moduleId);
+        }
+
+        // Fire backend request or return error
+        if ($this->_model != null) {
+            return $this->_model->create($data, $filters);
+        } else {
+            return $this->_noModelError();
+        }
+    }
+
+
+    /**
+     * Updates a record via service API.
+     * Accessed by Ext.Direct.
+     *
+     * @remotable
+     * @param array $data Data provided by Ext DirectProxy
+     * @return ORN_Backend_Result
+     */
+    public function update($data)
+    {
+        // Assign the id as filter
+        $filters = array();
+        if (is_object($data)) {
+            $filters = ORN_Backend::getFilterConfig('id', $data->id);
+
+            // Column model uses idstring and moduleName
+            if (isset($data->moduleId)) {
+                $filters = array();
+                $filters[] = ORN_Backend::getFilterConfig('idstring', $data->idstring, ORN_Type::TIDSTRING);
+                $filters[] = ORN_Backend::getFilterConfig('moduleId', $data->moduleId);
+                unset($data->moduleId);
+            }
+        }
+
+        // Fire backend request or return error
+        if ($this->_model != null) {
+            return $this->_model->update($filters, $data);
+        } else {
+            return $this->_noModelError();
+        }
+    }
+
+
+    /**
+     * Deletes a record via service API.
+     * Accessed by Ext.Direct.
+     *
+     * @remotable
+     * @param array $data Data provided by Ext DirectProxy
+     * @return ORN_Backend_Result
+     */
+    public function destroy($data)
+    {
+        // Assign the id as filter
+        $filters = array();
+        if (is_object($data)) {
+            $filters = ORN_Backend::getFilterConfig('id', $data->id);
+
+            // Column model uses idstring and moduleName
+            if (isset($data->moduleName)) {
+                $filters = array();
+                $filters[] = ORN_Backend::getFilterConfig('idstring', $data->idstring, ORN_Type::TIDSTRING);
+                $filters[] = ORN_Backend::getFilterConfig('moduleId', $data->moduleId);
+                unset($data->moduleName);
+            }
+        }
+
+        // Fire backend request or return error
+        if ($this->_model != null) {
+            return $this->_model->destroy($filters);
+        } else {
+            return $this->_noModelError();
+        }
+    }
+
+
+    /**
+     * The controller relies directly on the given model instance,
+     * which will be created by the constructor that uses the
+     * local member variables $_modelName and $_serviceName for
+     * that approach.
+     *
+     * @see library/Zend/Controller/Zend_Controller_Action#__call($methodName, $args)
+     */
+    public function __call($methodName, $arguments)
+    {
+        if (isset($this->_model) && $this->_model instanceof ORN_Model_Frontend) {
+
+            // Call the
+            return call_user_func_array(array($this->_model, $methodName), $arguments);
+
+        } else {
+            return $this->_noModelError();
+        }
+    }
+
+
+    /**
+     * Returns the no model error
+     * @return array
+     */
+    protected function _noModelError()
+    {
+        // Return Ext error
+
+        // If this error happens, $this->_modelname and $this->_serviceName should be provided
+        // in parent controller class!
+        return array(
+            "success" => false,
+            "message" => $this->tr("Model_ReflectionCrud_NoModelInstanceToCall") . ': ' .  get_class($this)
+        );
+    }
+}

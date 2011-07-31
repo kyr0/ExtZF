@@ -1,0 +1,65 @@
+{
+    projectName: "Extzf sample project",
+    deployDir: "../release/public/javascript",
+    licenseText: "MIT License",
+    pkgs: [{
+        name: "Ext JS 4 library",
+        file: "extzf-ext-all.js",
+        isDebug: true,
+        fileIncludes: [{
+            path: '../thirdparty/ext-4.0.2/', text: 'ext-all-debug-w-comments.js'
+        }]
+    }, {
+        name: "Extzf base library",
+        file: "extzf-library.js",
+        isDebug: true,
+        fileIncludes: [{
+            path: '../application/javascript/library/', text: 'Overrides.js'
+        }, {
+            path: '../application/javascript/library/', text: 'Core.js'
+        }, {
+            path: '../application/javascript/library/', text: 'Bootstrap.js'
+        }]
+    }, {
+        name: "Extzf application files",
+        file: "extzf-application.js",
+        isDebug: true,
+        fileIncludes: [{
+            path: '../application/javascript/modules/controller/', text: 'Core.js'
+        }, {
+            path: '../application/javascript/modules/model/', text: 'News.js'
+        }, {
+            path: '../application/javascript/modules/view/core/', text: 'Header.js'
+        }, {
+            path: '../application/javascript/modules/view/core/', text: 'NewsPanel.js'
+        }, {
+            path: '../application/javascript/modules/store/core/', text: 'News.js'
+        }, {
+            path: '../application/javascript/modules/view/news/', text: 'EditorPanel.js'
+        }, {
+            path: '../application/javascript/modules/view/news/', text: 'GridPanel.js'
+        }, {
+            path: '../application/javascript/modules/view/news/', text: 'AddNewsWindow.js'
+        }, {
+            path: '../application/javascript/modules/view/news/', text: 'Viewport.js'
+        }, {
+            path: '../application/javascript/modules/controller/', text: 'News.js'
+        }, {
+            path: '../application/javascript/modules/view/', text: 'Viewport.js'
+        }, {
+            path: '../application/javascript/', text: 'Application.js'
+        }]
+    }, {
+
+        name: "Extzf overall",
+        file: "extzf-all.js",
+        isDebug: true,
+        pkgDeps: [
+            'extzf-ext-all.js',
+            'extzf-library.js',
+            'extzf-application.js'
+        ],
+        fileIncludes: []
+    }],
+    resources: []
+} 

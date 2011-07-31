@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * ACL Plugin
+ */
+class ORN_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract
+{
+
+    /**
+     * Static / programmatic ACL for protecting against
+     * non-logged-in users.
+     *
+     * @access public
+     * @param Zend_Controller_Request_Abstract $_request
+     * @return void
+     */
+    public function preDispatch(Zend_Controller_Request_Abstract $_request)
+    {
+        // Get request dispatch data
+        $module = $_request->getModuleName();
+        $controller = $_request->getControllerName();
+        $action = $_request->getActionName();
+
+        // Todo: Checkup for logged-in-state
+        $session = Zend_Registry::get('Session');
+
+        // Checkup for guest users - only allowed to access welcome page
+        if (!$session->user instanceof ORN_Object_User ||
+            $session->user instanceof ORN_Object_User &&
+            $session->user->isLoggedIn !== true) {
+
+            // Only core, welcome and default module is allowed for guests
+            // Dynamic ACL operates on SAO / DAO layer. (After login)
+            if ((strtolower($module) !== "core")) {
+
+                $_request->setModuleName("core");
+                $_request->setControllerName("user");
+                $_request->setActionName("login");
+            }
+        }
+
+        // Check for specific permissions
+        //$acl = Zend_Registry::get('Acl');
+        /*
+        if (!$acl->isAllowed('Frontend_' . ucfirst($module) . '_' . ucfirst($controller), strtolower($action))) {
+            // Redirect
+        }
+        */
+    }
+}

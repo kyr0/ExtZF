@@ -1,0 +1,95 @@
+<!-- Extzf | build process -->
+<project name="Extzf-Sample" default="rebuild">
+  
+    <!-- Define variables -->
+    <property name="deployDir" value="release" />
+    <property name="buildDir" value="build" />
+    <property name="extjsDir" value="thirdparty/extjs-4.0.2" />
+    
+    
+    <!-- Bootstrapping build process -->
+    <target name="bootstrap">
+        <delete dir="release" />
+        <mkdir dir="release" />
+        <mkdir dir="release/log" />
+        <mkdir dir="release/cache" />
+        <mkdir dir="release/data" />
+
+        <mkdir dir="release/thirdparty" />
+    </target>
+    
+    
+    <!-- JSBuilder2 building -->
+    <target name="building">
+        
+        <echo>JavaScript building</echo>
+        
+        <java jar="thirdparty/jsbuilder2/JSBuilder2.jar"
+              fork="true"
+              failonerror="true" >
+            <jvmarg value="-Dfile.encoding=UTF-8" />
+            <arg value="-p" />
+            <arg path="${buildDir}/build.jsb2" />
+            <arg value="-d" />
+            <arg path="${buildDir}/" />
+            <arg value="-v" />
+        </java>
+        
+    </target>
+    
+    <!-- Copy resources -->
+    <target name="copyresources">
+        
+        <echo>Copying resources</echo>
+        
+        <!-- Copy test framework files -->
+        <copydir dest="${deployDir}/application" src="application" />
+        <copydir dest="${deployDir}/library" src="library" />
+        <copydir dest="${deployDir}/public" src="public" />
+        <copydir dest="${deployDir}/thirdparty/ExtDirect" src="thirdparty/ExtDirect" />
+        <copydir dest="${deployDir}/public/resources" src="thirdparty/ext-4.0.2/resources" />
+    </target>
+    
+    
+    <!-- Copy resources lightweight (without lib, thirdparty) -->
+    <target name="copyresources_lightweight">
+        
+        <echo>Copying resources lightweight</echo>
+        
+        <!-- Copy test framework files -->
+        <copydir dest="${deployDir}/application" src="application" />
+        <copydir dest="${deployDir}/public" src="public" />
+        <copydir dest="${deployDir}/library/Extzf" src="library/Extzf" />
+        <copydir dest="${deployDir}/public/resources" src="thirdparty/ext-4.0.2/resources" />
+    </target>
+    
+    
+    <!-- Generates the javascript language files for each language, packed as one file (ext, ia) -->
+    <target name="lang">
+        <exec executable="php">
+            <arg line="bin/generateLanguageFiles.php"/>
+        </exec>
+    </target>
+        
+
+    <!-- Generates the direct provider file -->
+    <target name="direct">
+        <exec executable="php">
+            <arg line="bin/generateDirectProvider.php"/>
+        </exec>
+    </target>
+    
+        
+    <!-- Fast building process (no library copy, only JS building) -->
+    <target name="php" depends="copyresources_lightweight" />
+    
+    <!-- Fast building process (no library copy, only JS building) -->
+    <target name="js" depends="copyresources_lightweight,building" />
+    
+    <!-- Builds php and js -->
+    <target name="rebuild" depends="php,js" />
+    
+    <!-- Production building process -->
+    <target name="init" depends="bootstrap,copyresources,building,direct,lang"></target>
+    
+</project>

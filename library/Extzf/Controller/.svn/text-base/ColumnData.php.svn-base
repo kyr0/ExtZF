@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Directly accesses the column model / column data API.
+ *
+ * Base class for general Ext.Direct store calls (CRUD).
+ * Controls the parameter processing for filtering,
+ * pagination, sorting etc.
+ */
+class ORN_Controller_ColumnData extends ORN_Controller_Store
+{
+    /**
+     * Service name
+     * @var string
+     */
+    protected $_serviceName = 'Core_ColumnData';
+}

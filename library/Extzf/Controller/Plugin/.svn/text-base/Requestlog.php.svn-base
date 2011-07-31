@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Requestlog Plugin
+ */
+class ORN_Controller_Plugin_Requestlog extends Zend_Controller_Plugin_Abstract
+{
+
+    /**
+     * Logs the dispatched call and saves it to the logger database table
+     *
+     * @access public
+     * @param Zend_Controller_Request_Abstract $_request
+     * @return void
+     */
+    public function preDispatch (Zend_Controller_Request_Abstract $_request)
+    {
+        // May log requests
+         
+        /*
+         // Get request dispatch data
+         $module = $_request->getModuleName();
+         $controller = $_request->getControllerName();
+         $action = $_request->getActionName();
+         $params = Zend_Json::encode($_request->getParams());
+
+         if (isset(Zend_Registry::get('Session')->userId)) {
+         $userId = (int) Zend_Registry::get('Session')->userId;
+         }
+         else {
+         $userId = 0;
+         }
+         // Do not log data fetching, just log data manipulating requests
+         if (strstr($action, "get") != false || strstr($action, "load") != false || strstr($action, "index") != false ||
+         strstr($action, "tracklogin") != false || strstr($controller, "stream") != false) {
+         return;
+         }
+         */
+
+        /*
+         // Create BOM model instance and log
+         $logRecord = new ORN_Model_Requestlog();
+         $logRecord->module = $module;
+         $logRecord->controller = $controller;
+         $logRecord->action = $action;
+         $logRecord->params = $params;
+         $logRecord->userid = $userId;
+         $logRecord->save();
+         */
+    }
+}

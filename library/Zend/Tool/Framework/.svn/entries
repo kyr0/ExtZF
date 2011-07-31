@@ -1,0 +1,120 @@
+10
+
+dir
+554
+svn://192.168.10.82/intelliad_library/trunk/library/Zend/Tool/Framework
+svn://192.168.10.82/intelliad_library
+
+
+
+2010-12-07T17:17:49.233606Z
+13
+ahomberg
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+7e5db538-da00-4658-87b2-1b219cf1a9b1
+
+Action
+dir
+
+Client
+dir
+
+Exception.php
+file
+
+
+
+
+2011-01-27T12:46:34.644000Z
+935753f4d5452e69e10cb4ee27c96c11
+2010-12-07T17:17:49.233606Z
+13
+ahomberg
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1121
+
+Loader
+dir
+
+Manifest
+dir
+
+Metadata
+dir
+
+Provider
+dir
+
+Registry
+dir
+
+Registry.php
+file
+
+
+
+
+2011-01-27T12:46:35.783000Z
+9d0a9cbaeb6366c3a8ad31937d3d1051
+2010-12-07T17:17:49.233606Z
+13
+ahomberg
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11586
+
+System
+dir
+

@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * Controller class to
+ */
+class ORN_Controller_Legacy extends ORN_Controller
+{
+
+    /**
+     * Legacy database driver reference
+     * @var db_driver
+     */
+    protected $db = null;
+
+
+    /**
+     * Legacy session reference
+     * @var UserSession
+     */
+    protected $session = null;
+
+
+    /**
+     * Legacy Database query (logoff) standard reference
+     * @var DatabaseQueryLogoff
+     */
+    protected $dbQuery = null;
+
+
+    /**
+     * Legacy input filter reference
+     * @var InputFilter
+     */
+    protected $inputFilter = null;
+
+
+    /**
+     * Legacy input array reference
+     * @var array
+     */
+    protected $input = null;
+
+
+    /**
+     * Legacy phrase reference
+     * @var array
+     */
+    protected $phrase = null;
+
+
+    /**
+     * Legacy locale reference
+     * @var array
+     */
+    protected $locale = null;
+
+
+    /**
+     * Assign Smarty as view renderer.
+     * @return void
+     */
+    public function init ()
+    {
+        parent::init();
+
+        // Assign local vars
+        $this->db = Zend_Registry::get('Db');
+        $this->session = Zend_Registry::get('Session');
+        $this->dbQuery = Zend_Registry::get('DbQuery');
+        $this->inputFilter = Zend_Registry::get('InputFilter');
+        $this->input = Zend_Registry::get('Input');
+        $this->phrase = Zend_Registry::get('Phrase');
+        $this->locale = Zend_Registry::get('Locale');
+
+        // Zend_View / Zend_Layout related stuff only when not called by Ext.Direct
+        if (!ORN_ExtDirect::isDirectRequest()) {
+            // Disable phtml view scripts by default
+            //$this->_disableRendering();
+        }
+
+    }
+
+
+    /**
+     * Renders a smarty legacy template.
+     *
+     * @param string $tpl Template path (e.g. 'kunden/alerting/index.tpl')
+     * @param string $layoutTpl Optional layout template path (e.g. 'kunden/global.tpl')
+     * @return string Returns the rendered template code
+     */
+    public function renderSmarty($tpl, $layoutTpl = 'kunden/global.tpl')
+    {
+        return ORN_Frontend_Legacy::renderSmarty($tpl, $layoutTpl);
+    }
+}
