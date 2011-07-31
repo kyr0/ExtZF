@@ -1,0 +1,63 @@
+<?php
+
+// Debug flag setting for compressed JS
+$debug = "";
+if (isset($_REQUEST['debug'])) {
+    $debug = "-debug";
+}
+
+// Include module based language script includes
+$revision = Zend_Registry::get('CurrentRevision');
+$locale = substr(Zend_Registry::get('Locale'), 0, 2);
+
+// Define the request parameters to enable the
+// JavaScript FrontController dispatching the request.
+$frontControllerRequest = sprintf("
+
+    <script type=\"text/javascript\"/>
+        Extzf.FrontController = {
+            module: '%s',
+            controller: '%s',
+            action: '%s',
+            params: '%s',
+            locale: '%s'
+        };
+    </script>
+
+", strtolower($this->moduleName),
+   $this->controllerName,
+   $this->actionName,
+   $this->jsParams,
+   $locale);
+?>
+
+
+<html>
+    <head>
+        <title>ExtZF sample page</title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="/resources/css/extzf-all.css" type="text/css"></link>
+
+        <!-- Special overrides CSS based -->
+        <link rel="stylesheet" href="/stylesheets/overrides.css" type="text/css"></link>
+
+        <!-- JavaScript libraries -->
+        <script src="/javascript/extzf-ext-all<?php echo $debug ?>.js?revision=<?php echo $revision ?>" type="text/javascript"></script>
+        <script src="/javascript/extzf-library<?php echo $debug ?>.js?revision=<?php echo $revision ?>" type="text/javascript"></script>
+
+        <!-- Translation -->
+        <script src="/javascript/extzf-lang-<?php echo $locale ?>.js?revision=<?php echo $revision ?>" type="text/javascript"></script>
+
+        <!-- Ext.Direct RPC provider -->
+        <script src="/javascript/Provider.js?revision=<?php echo $revision ?>" type="text/javascript"></script>
+
+        <!-- Application classes -->
+        <script src="/javascript/extzf-application<?php echo $debug ?>.js?revision=<?php echo $revision ?>" type="text/javascript"></script>
+
+    </head>
+    <body>
+        <?php echo $frontControllerRequest ?>
+        <?php echo $this->layout()->content ?>
+    </body>
+</html>
